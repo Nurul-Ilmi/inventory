@@ -11,7 +11,6 @@ class Item extends Model
 
     protected $fillable = ['name', 'quantity', 'price', 'category_id'];
 
-    // Relasi: Satu item dimiliki oleh satu kategori (Many to One)
     public function category()
     {
         return $this->belongsTo(Category::class);
