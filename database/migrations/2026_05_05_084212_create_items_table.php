@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
     public function up(): void
     {
         Schema::create('items', function (Blueprint $table) {
@@ -16,15 +14,11 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedInteger('quantity')->default(0);
             $table->decimal('price', 12, 2)->default(0);
-            // Foreign key ke tabel categories
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('items');
