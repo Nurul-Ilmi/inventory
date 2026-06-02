@@ -4,54 +4,75 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
-
+use App\Http\Requests\StoreItemRequest;
+use App\Http\Requests\UpdateItemRequest;
+use App\Services\ItemService;
+use Exception;
 
 class ItemController extends Controller
 {
-    // Mengambil semua item beserta data kategorinya (Eager Loading)
+    protected ItemService $svc;
+
+    public function __construct(ItemService $svc)
+    {
+        $this->svc = $svc;
+    }
+
     public function index()
     {
-        return response()->json(Item::with('category')->get());
-    }
-
-    // Menyimpan item baru
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => Item::with('category')->get(),
+            'message' => 'Berhasil menarik semua data Item'
         ]);
-
-        $item = Item::create($validated);
-        return response()->json($item, 201);
     }
 
-    // Menampilkan satu item berdasarkan ID
-    public function show(Item $item)
+    public function store(StoreItemRequest $req)
     {
-        return response()->json($item->load('category'));
+        $item = $this->svc->create($req->validated());
+        return response()->json([
+            'status' => 'success',
+            'data' => $item,
+            'message' => 'Item berhasil dibuat'
+        ], 201);
     }
 
-    // Mengubah data item
-    public function update(Request $request, Item $item)
+    public function show($id)
     {
-        $validated = $request->validate([
-            'name' => 'string|max:255',
-            'quantity' => 'integer|min:0',
-            'price' => 'numeric|min:0',
-            'category_id' => 'exists:categories,id',
+        try {
+            $item = $this->svc->find($id);
+            return response()->json([
+                'status' => 'success',
+                'data' => $item,
+                'message' => 'Berhasil menarik satu data Item'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'data' => null,
+                'message' => $e->getMessage()
+            ], 404);
+        }
+    }
+
+    public function update(UpdateItemRequest $req, $id)
+    {
+        $item = $this->svc->update($id, $req->validated());
+        return response()->json([
+            'status' => 'success',
+            'data' => $item,
+            'message' => 'Item berhasil diperbarui'
         ]);
-
-        $item->update($validated);
-        return response()->json($item);
     }
 
-    // Menghapus item
-    public function destroy(Item $item)
+    public function destroy($id)
     {
-        $item->delete();
-        return response()->json(['message' => 'Item deleted successfully']);
+        $this->svc->delete($id);
+        return response()->json([
+            'status' => 'success',
+            'data' => null,
+            'message' => 'Item berhasil dihapus'
+        ], 200); 
     }
 }
