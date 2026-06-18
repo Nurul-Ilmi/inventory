@@ -16,6 +16,8 @@ Base URL: http://localhost:8000/api/v1
 
 ## Items
 - GET /items
+  Query Parameters (Optional):
+  * category_id : Menyaring data item berdasarkan ID kategori.
 - POST /items { name, quantity, price, category_id }
 - GET /items/{id}
 - PUT /items/{id}

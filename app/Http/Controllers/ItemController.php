@@ -6,6 +6,8 @@ use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Services\ItemService;
 use App\Http\Controllers\Api\BaseController;
+use Illuminate\Http\Request;
+use App\Models\Item;
 use Exception;
 
 class ItemController extends BaseController
@@ -17,9 +19,15 @@ class ItemController extends BaseController
         $this->svc = $svc;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return $this->success($this->svc->all());
+        $query = Item::query();
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        return $this->success($query->get());
     }
 
     public function store(StoreItemRequest $req)
