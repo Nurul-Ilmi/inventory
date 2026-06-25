@@ -31,7 +31,8 @@ class ItemController extends BaseController
     }
 
     public function store(StoreItemRequest $req)
-    {
+    {   
+        
         $item = $this->svc->create($req->validated());
         return $this->success($item, "Item dibuat", 201);
     }
